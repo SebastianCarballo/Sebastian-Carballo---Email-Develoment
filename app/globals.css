@@ -1,26 +1,199 @@
 @import "tailwindcss";
 
+@theme {
+  --color-paper: #f8fafc;
+  --color-ink: #0a0f1e;
+  --color-ink-soft: #141c33;
+  --color-inbox: #00d4ff;
+  --color-cta: #ff6b35;
+  --color-sent: #00e676;
+  --color-muted: #64748b;
+  --font-sans: var(--font-geist-sans), Inter, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+.email-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  animation: grid-pan 24s linear infinite;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 60%, transparent 100%);
+}
+
+.code-window pre {
+  tab-size: 2;
+}
+
+@keyframes grid-pan {
+  to {
+    background-position: 56px 56px;
+  }
+}
+
+/* Orbes animados del hero */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.55;
+}
+
+.orb-a {
+  width: 480px;
+  height: 480px;
+  left: -120px;
+  top: -140px;
+  background: radial-gradient(circle, rgb(0 212 255 / 0.5), transparent 65%);
+  animation: drift-a 14s ease-in-out infinite alternate;
+}
+
+.orb-b {
+  width: 420px;
+  height: 420px;
+  right: -100px;
+  top: 10%;
+  background: radial-gradient(circle, rgb(255 107 53 / 0.45), transparent 65%);
+  animation: drift-b 18s ease-in-out infinite alternate;
+}
+
+.orb-c {
+  width: 520px;
+  height: 300px;
+  left: 30%;
+  bottom: -140px;
+  background: radial-gradient(circle, rgb(0 230 118 / 0.28), transparent 65%);
+  animation: drift-a 20s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate(60px, 40px) scale(1.1);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate(-70px, 50px) scale(1.15);
+  }
+}
+
+.hero-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.type-caret {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--color-inbox);
+  animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.glow-inbox {
+  box-shadow: 0 0 0 1px rgb(0 212 255 / 0.25), 0 8px 40px -8px rgb(0 212 255 / 0.45);
+}
+
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: shine 3.5s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0%, 60% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.card-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 40%, rgb(0 212 255 / 0.12) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+
+.card-sheen:hover::before {
+  transform: translateX(100%);
+}
+
+.gradient-text {
+  background: linear-gradient(92deg, #00d4ff 10%, #00e676 50%, #ff6b35 90%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-x 6s ease infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .email-grid,
+  .marquee-track,
+  .btn-shine::after,
+  .orb,
+  .gradient-text,
+  .type-caret {
+    animation: none;
+  }
 }

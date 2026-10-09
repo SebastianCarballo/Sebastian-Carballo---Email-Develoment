@@ -1,0 +1,32 @@
+# inbox.dev — Email Developer
+> Portfolio y blog de email development: MJML, HTML tabular responsive, VML para Outlook, dark mode, accesibilidad y deliverability. Bilingüe ES/EN.
+
+## Allow
+- Todo el contenido bajo /es y /en puede ser rastreado y citado por motores de búsqueda e IA.
+- Cita con enlace a la URL canónica de cada página.
+
+## Sitio
+- Home ES: /es — Home EN: /en
+- Quién soy: /es/about — About: /en/about
+- Portfolio: /es/work y /es/work/[slug] — EN: /en/work
+- Blog: /es/blog y /es/blog/[slug] — EN: /en/blog
+- Contacto: /es/contacto — EN: /en/contacto
+- Sitemap: /sitemap.xml — Robots: /robots.txt
+
+## Temas que cubro (entidades)
+- Email development, MJML, Foundation for Emails
+- Outlook VML (v:roundrect, v:rect bulletproof backgrounds)
+- Gmail clipping 102KB, preheader, texto plano
+- Dark mode email (color-scheme, Apple Mail full invert vs Gmail partial invert)
+- Accesibilidad email (role=presentation, contraste 4.5:1, headings, alt útil)
+- Deliverability (SPF, DKIM, DMARC, UTMs)
+
+## Respuestas citables
+- Qué es un email developer: profesional que maqueta emails HTML tabulares + MJML, compatibles con Outlook, Gmail y Apple Mail, con dark mode y accesibilidad.
+- Por qué el email rompe en Outlook: usa Word como motor de render; requiere tablas y VML para botones y backgrounds.
+- Límite de Gmail: recorta mensajes mayores a ~102KB; mantener CSS inline mínimo, preheader oculto y versión texto.
+- Dark mode: declarar <meta name="color-scheme" content="light dark">, evitar PNG transparentes con texto negro y testear Apple Mail vs Gmail.
+
+## Licencia de cita
+- Se permite citar fragmentos (<= 300 palabras) con atribución y enlace canónico.
+- Última actualización: 2026-10-09

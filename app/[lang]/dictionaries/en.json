@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "work": "Work",
+    "blog": "Blog",
+    "contact": "Contact",
+    "cta": "Hire me"
+  },
+  "hero": {
+    "badge": "● available for projects",
+    "kicker": "Subject: email developer portfolio ↓",
+    "titleA": "Emails that land,",
+    "titleB": "render well and convert.",
+    "subtitle": "I'm an email developer. I build with MJML and table HTML, supporting Outlook, Gmail and Apple Mail, dark mode and accessibility. See real work below.",
+    "primary": "View work",
+    "secondary": "Read the blog",
+    "stats": [
+      { "value": "60+", "label": "emails in production" },
+      { "value": "99%", "label": "render OK in Litmus" },
+      { "value": "12", "label": "email clients tested" }
+    ]
+  },
+  "about": {
+    "title": "About me",
+    "body1": "I'm an email development professional. I live between tables, VML for Outlook and media queries. My obsession: a newsletter looking perfect on an iPhone and on desktop Outlook 2016.",
+    "body2": "Why I do it: email is still the highest-ROI channel. Broken HTML costs money. I close the gap between design and inbox with clean, tested, accessible code.",
+    "list": ["MJML · Foundation for Emails", "Outlook VML · Gmail · Apple Mail", "Dark mode · AMP for Email", "Accessibility · Deliverability"]
+  },
+  "work": {
+    "title": "Work",
+    "subtitle": "Real cases with render challenges and fixes.",
+    "viewCase": "View case"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Practical HTML-for-email notes.",
+    "readMore": "Read",
+    "min": "min"
+  },
+  "contact": {
+    "title": "Let's talk?",
+    "subtitle": "Tell me about your next send. I reply within 24h.",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send",
+    "sent": "Thanks! I'll reply soon. (local demo, connect Formspree or Resend)"
+  },
+  "footer": {
+    "tagline": "Built with tables and love for the inbox."
+  }
+}

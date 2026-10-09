@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Quién soy",
+    "work": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contacto",
+    "cta": "Contrátame"
+  },
+  "hero": {
+    "badge": "● disponible para proyectos",
+    "kicker": "Subject: portfolio de email developer ↓",
+    "titleA": "Emails que llegan,",
+    "titleB": "se ven bien y convierten.",
+    "subtitle": "Soy email developer. Maqueto con MJML y HTML tabular, soporto Outlook, Gmail y Apple Mail, dark mode y accesibilidad. Mira mi trabajo real abajo.",
+    "primary": "Ver portfolio",
+    "secondary": "Leer el blog",
+    "stats": [
+      { "value": "60+", "label": "emails en producción" },
+      { "value": "99%", "label": "render OK en Litmus" },
+      { "value": "12", "label": "clientes de correo testeados" }
+    ]
+  },
+  "about": {
+    "title": "Quién soy",
+    "body1": "Soy profesional del email development. Vivo entre tablas, VML para Outlook y media queries. Mi obsesión: que un newsletter se vea perfecto en un iPhone y también en Outlook 2016 de escritorio.",
+    "body2": "Por qué lo hago: el email sigue siendo el canal con mayor ROI. Un HTML roto cuesta dinero. Yo cierro esa brecha entre diseño y bandeja de entrada con código limpio, testeado y accesible.",
+    "list": ["MJML · Foundation for Emails", "Outlook VML · Gmail · Apple Mail", "Dark mode · AMP for Email", "Accesibilidad · Deliverability"]
+  },
+  "work": {
+    "title": "Portfolio",
+    "subtitle": "Casos reales con retos de render y solución.",
+    "viewCase": "Ver caso"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Notas prácticas de HTML para email.",
+    "readMore": "Leer",
+    "min": "min"
+  },
+  "contact": {
+    "title": "¿Hablamos?",
+    "subtitle": "Cuéntame tu próximo envío. Respondo en 24h.",
+    "name": "Nombre",
+    "email": "Email",
+    "message": "Mensaje",
+    "send": "Enviar",
+    "sent": "¡Gracias! Te escribo pronto. (demo local, conecta Formspree o Resend)"
+  },
+  "footer": {
+    "tagline": "Hecho con tablas y amor por la bandeja de entrada."
+  }
+}
