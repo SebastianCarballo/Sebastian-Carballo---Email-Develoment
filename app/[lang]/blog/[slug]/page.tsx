@@ -8,6 +8,7 @@ import { posts } from "@/lib/data";
 import JsonLd from "@/components/seo/JsonLd";
 import AnswerBox from "@/components/seo/AnswerBox";
 import Faq, { faqJsonLd } from "@/components/seo/Faq";
+import ShareButtons from "@/components/seo/ShareButtons";
 import { canonical, siteUrl } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -97,12 +98,28 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
   const excerpt = (post[`excerpt_${lang}`] as string) ?? (post.excerpt as Record<string, string> | undefined)?.[lang] ?? "";
   const mockBody = (post.body as Record<string, string[]> | undefined)?.[lang];
   const sanityBody = portableTextToParagraphs(post[`body_${lang}`]);
-  const paragraphs = mockBody ?? sanityBody;
+  const rawParagraphs = mockBody ?? sanityBody;
+  // On-page: bloques "## " se renderizan como h2 para estructura de headings.
+  const blocks = rawParagraphs.map((para) =>
+    para.startsWith("## ") ? { h: true as const, text: para.slice(3) } : { h: false as const, text: para }
+  );
+  const lede = blocks.find((b) => !b.h)?.text ?? "";
   const category = (post.category as string) ?? "";
   const date = (post.date as string) ?? "";
   const minutes = Number(post.minutes ?? 5);
   const tags = (post.tags as string[]) ?? [];
   const faqs = POST_FAQS[String(post.slug)]?.[lang] ?? [];
+  // Enlazado interno: relacionados por categoría o tags; si no hay
+  // coincidencias, se muestran otros artículos para no dejar cabos sueltos.
+  const others = posts.filter((p) => p.slug !== String(post.slug));
+  const scored = others
+    .map((p) => ({
+      slug: p.slug,
+      score: (p.category === category ? 2 : 0) + p.tags.filter((t) => tags.includes(t)).length,
+      title: p.title[lang as "es" | "en"],
+    }))
+    .sort((a, b) => b.score - a.score);
+  const related = (scored.some((p) => p.score > 0) ? scored.filter((p) => p.score > 0) : scored).slice(0, 2);
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -138,16 +155,20 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
       <h1 className="mt-1 text-4xl font-extrabold leading-tight">{title}</h1>
       <div className="mt-4">
         <AnswerBox title={lang === "es" ? "Respuesta directa" : "Direct answer"}>
-          <p>{excerpt} {paragraphs[0] ?? ""}</p>
+          <p>{excerpt} {lede}</p>
         </AnswerBox>
       </div>
       <p className="mt-4 text-lg text-slate-600">{excerpt}</p>
       <div className="mt-6 space-y-4">
-        {paragraphs.map((para: string, i: number) => (
-          <p key={i} className={`leading-relaxed ${i === 0 ? "text-lg text-slate-800" : "text-slate-700"}`}>
-            {para}
-          </p>
-        ))}
+        {blocks.map((b, i) =>
+          b.h ? (
+            <h2 key={i} className="pt-2 text-2xl font-extrabold tracking-tight">{b.text}</h2>
+          ) : (
+            <p key={i} className={`leading-relaxed ${i === 0 ? "text-lg text-slate-800" : "text-slate-700"}`}>
+              {b.text}
+            </p>
+          )
+        )}
       </div>
       <div className="mt-8 flex flex-wrap gap-2">
         {tags.map((t: string) => (
@@ -155,6 +176,22 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
         ))}
       </div>
       {faqs.length > 0 && <Faq items={faqs} heading={lang === "es" ? "Preguntas frecuentes del artículo" : "Article FAQ"} />}
+      {related.length > 0 && (
+        <section aria-labelledby="related-heading" className="mt-10">
+          <h2 id="related-heading" className="text-xl font-extrabold">
+            {lang === "es" ? "Seguir leyendo" : "Keep reading"}
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {related.map((r) => (
+              <Link key={r.slug} href={`/${lang}/blog/${r.slug}`} className="rounded-xl border bg-white p-4 transition hover:shadow-md">
+                <span className="font-bold">{r.title}</span>
+                <span className="mt-1 block text-sm font-semibold text-cta">{dict.blog.readMore} →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      <ShareButtons title={title} path={`/${lang}/blog/${slug}`} />
       <p className="mt-6 border-t pt-4 font-mono text-xs text-slate-400">
         {lang === "es" ? "Fuente primaria" : "Primary source"}: <a className="underline" href={canonical(`/${lang}/blog/${slug}`)}>{lang === "es" ? "URL canónica" : "Canonical URL"}</a> · {lang === "es" ? "Cita permitida ≤300 palabras con enlace" : "Quotes ≤300 words allowed with link"}
       </p>

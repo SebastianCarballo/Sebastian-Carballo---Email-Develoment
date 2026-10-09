@@ -6,10 +6,11 @@ export const siteName = "inbox.dev — Email Developer";
 export const authorName = "Email Developer";
 export const authorJob = "Email Developer — MJML, HTML responsive, dark mode";
 export const socials = {
-  github: "https://github.com/",
+  github: "https://github.com/SebastianCarballo/Sebastian-Carballo---Email-Develoment",
   linkedin: "https://www.linkedin.com/",
   x: "https://x.com/",
 };
+export const contactEmail = "hola@inbox.dev";
 
 export const keywordsBase = [
   "email developer",

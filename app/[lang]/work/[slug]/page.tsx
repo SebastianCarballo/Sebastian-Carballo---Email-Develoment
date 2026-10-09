@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import ClientBadges from "@/components/email-ui/ClientBadges";
 import JsonLd from "@/components/seo/JsonLd";
 import AnswerBox from "@/components/seo/AnswerBox";
+import Faq, { faqJsonLd } from "@/components/seo/Faq";
 import { hasLocale } from "@/lib/i18n";
 import { getDictionary } from "../../dictionaries";
-import { cmsGetProject } from "@/lib/cms";
+import { cmsGetProject, cmsGetProjects } from "@/lib/cms";
 import { projects } from "@/lib/data";
 import { canonical } from "@/lib/seo";
 
@@ -50,6 +51,21 @@ export default async function ProjectPage(props: PageProps<"/[lang]/work/[slug]"
   if (!project) notFound();
   await getDictionary(lang);
 
+  const faqs = lang === "es"
+    ? [
+        { q: `¿Qué problema resolvía ${project.client}?`, a: project.challenge[lang] },
+        { q: "¿Cómo se solucionó?", a: project.solution[lang] },
+        { q: "¿Qué resultados se midieron?", a: project.results.join(", ") + "." },
+      ]
+    : [
+        { q: `What problem did ${project.client} face?`, a: project.challenge[lang] },
+        { q: "How was it fixed?", a: project.solution[lang] },
+        { q: "What results were measured?", a: project.results.join(", ") + "." },
+      ];
+  const related = (await cmsGetProjects(lang))
+    .filter((p) => p.slug !== slug)
+    .slice(0, 2);
+
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -72,7 +88,7 @@ export default async function ProjectPage(props: PageProps<"/[lang]/work/[slug]"
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-14">
-      <JsonLd data={[breadcrumbLd, workLd]} />
+      <JsonLd data={[breadcrumbLd, workLd, faqJsonLd(faqs)]} />
       <nav aria-label="Breadcrumb">
         <Link href={`/${lang}/work`} className="text-sm underline">← work</Link>
       </nav>
@@ -126,6 +142,22 @@ export default async function ProjectPage(props: PageProps<"/[lang]/work/[slug]"
           </div>
         </div>
       </div>
+      <Faq items={faqs} heading={lang === "es" ? "Preguntas del caso" : "Case FAQ"} />
+      {related.length > 0 && (
+        <section aria-labelledby="related-work" className="mt-10">
+          <h2 id="related-work" className="text-xl font-extrabold">
+            {lang === "es" ? "Otros casos" : "More work"}
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {related.map((r) => (
+              <Link key={r.slug} href={`/${lang}/work/${r.slug}`} className="rounded-xl border bg-white p-4 transition hover:shadow-md">
+                <span className="font-mono text-xs text-muted">{r.client} · {r.year}</span>
+                <span className="mt-1 block font-bold">{r.tTitle}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }

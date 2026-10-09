@@ -2,6 +2,13 @@ import { hasSanityEnv } from "@/sanity/env";
 import { sanityFetch } from "@/sanity/lib/live";
 import { POSTS_QUERY, POST_QUERY, PROJECTS_QUERY, PROJECT_QUERY } from "@/sanity/lib/queries";
 import {
+  hasStrapiEnv,
+  strapiGetPost,
+  strapiGetPosts,
+  strapiGetProject,
+  strapiGetProjects,
+} from "@/lib/strapi";
+import {
   getPost as getMockPost,
   getPosts as getMockPosts,
   getProject as getMockProject,
@@ -10,6 +17,31 @@ import {
 } from "@/lib/data";
 
 type Locale = "es" | "en";
+
+// Prioridad: Strapi (local) → Sanity → mock.
+async function first<T>(
+  strapiFn: () => Promise<T[] | T | undefined>,
+  sanityFn: () => Promise<T[] | T | undefined>,
+  mock: T[] | T | undefined
+): Promise<T[] | T | undefined> {
+  if (hasStrapiEnv) {
+    try {
+      const data = await strapiFn();
+      if (Array.isArray(data) ? data.length > 0 : data) return data;
+    } catch {
+      // cae a Sanity/mock
+    }
+  }
+  if (hasSanityEnv) {
+    try {
+      const data = await sanityFn();
+      if (Array.isArray(data) ? data.length > 0 : data) return data;
+    } catch {
+      // cae a mock
+    }
+  }
+  return mock;
+}
 
 function toProject(row: Record<string, unknown>, locale: Locale) {
   const slug = String(row.slug ?? "");
@@ -44,47 +76,49 @@ function toPost(row: Record<string, unknown>, locale: Locale) {
 }
 
 export async function cmsGetProjects(locale: Locale) {
-  if (!hasSanityEnv) return getMockProjects(locale as MockLocale);
-  try {
-    const { data } = await sanityFetch({ query: PROJECTS_QUERY });
-    const rows = data as unknown as Record<string, unknown>[];
-    if (!Array.isArray(rows) || !rows.length) return getMockProjects(locale as MockLocale);
-    return rows.map((r) => toProject(r, locale));
-  } catch {
-    return getMockProjects(locale as MockLocale);
-  }
+  const list = (await first(
+    () => strapiGetProjects(locale),
+    async () => {
+      const { data } = await sanityFetch({ query: PROJECTS_QUERY });
+      const rows = data as unknown as Record<string, unknown>[];
+      return Array.isArray(rows) ? rows.map((r) => toProject(r, locale)) : [];
+    },
+    getMockProjects(locale as MockLocale)
+  )) as ReturnType<typeof getMockProjects> | undefined;
+  return list ?? getMockProjects(locale as MockLocale);
 }
 
 export async function cmsGetProject(slug: string, locale: Locale) {
-  if (!hasSanityEnv) return getMockProject(slug);
-  try {
-    const { data } = await sanityFetch({ query: PROJECT_QUERY, params: { slug } });
-    if (!data) return getMockProject(slug);
-    return toProject(data as Record<string, unknown>, locale);
-  } catch {
-    return getMockProject(slug);
-  }
+  return first(
+    () => strapiGetProject(slug, locale),
+    async () => {
+      const { data } = await sanityFetch({ query: PROJECT_QUERY, params: { slug } });
+      return data ? toProject(data as Record<string, unknown>, locale) : undefined;
+    },
+    getMockProject(slug)
+  );
 }
 
 export async function cmsGetPosts(locale: Locale) {
-  if (!hasSanityEnv) return getMockPosts(locale as MockLocale);
-  try {
-    const { data } = await sanityFetch({ query: POSTS_QUERY });
-    const rows = data as unknown as Record<string, unknown>[];
-    if (!Array.isArray(rows) || !rows.length) return getMockPosts(locale as MockLocale);
-    return rows.map((r) => toPost(r, locale));
-  } catch {
-    return getMockPosts(locale as MockLocale);
-  }
+  const list = (await first(
+    () => strapiGetPosts(locale),
+    async () => {
+      const { data } = await sanityFetch({ query: POSTS_QUERY });
+      const rows = data as unknown as Record<string, unknown>[];
+      return Array.isArray(rows) ? rows.map((r) => toPost(r, locale)) : [];
+    },
+    getMockPosts(locale as MockLocale)
+  )) as ReturnType<typeof getMockPosts> | undefined;
+  return list ?? getMockPosts(locale as MockLocale);
 }
 
 export async function cmsGetPost(slug: string) {
-  if (!hasSanityEnv) return getMockPost(slug);
-  try {
-    const { data } = await sanityFetch({ query: POST_QUERY, params: { slug } });
-    if (!data) return getMockPost(slug);
-    return data;
-  } catch {
-    return getMockPost(slug);
-  }
+  return first(
+    () => strapiGetPost(slug),
+    async () => {
+      const { data } = await sanityFetch({ query: POST_QUERY, params: { slug } });
+      return (data as Record<string, unknown>) ?? undefined;
+    },
+    getMockPost(slug)
+  );
 }
