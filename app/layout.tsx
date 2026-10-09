@@ -55,6 +55,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  // Checklist #11: pega tu código de Search Console en .env.local
+  // como NEXT_PUBLIC_GOOGLE_VERIFICATION para verificar la propiedad.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -6,7 +6,7 @@ import ScrollProgress from "@/components/motion/ScrollProgress";
 import JsonLd from "@/components/seo/JsonLd";
 import { hasLocale, locales } from "@/lib/i18n";
 import { getDictionary } from "./dictionaries";
-import { siteUrl, socials, canonical } from "@/lib/seo";
+import { siteUrl, socials, canonical, keywordsByPage } from "@/lib/seo";
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -26,6 +26,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   return {
     title,
     description,
+    keywords: keywordsByPage.home[lang as "es" | "en"],
     alternates: {
       canonical: canonical(`/${lang}`),
       languages: { [lang]: canonical(`/${lang}`), [other]: canonical(`/${other}`), "x-default": canonical("/es") },

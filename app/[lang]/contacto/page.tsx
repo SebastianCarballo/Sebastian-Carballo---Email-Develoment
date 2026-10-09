@@ -4,7 +4,7 @@ import ContactForm from "@/components/ContactForm";
 import JsonLd from "@/components/seo/JsonLd";
 import { hasLocale } from "@/lib/i18n";
 import { getDictionary } from "../dictionaries";
-import { canonical } from "@/lib/seo";
+import { canonical, keywordsByPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params;
@@ -16,6 +16,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   return {
     title,
     description,
+    keywords: keywordsByPage.contact[lang as "es" | "en"],
     alternates: { canonical: canonical(`/${lang}/contacto`) },
     openGraph: { title, description, url: canonical(`/${lang}/contacto`) },
   };

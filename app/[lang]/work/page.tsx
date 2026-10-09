@@ -7,7 +7,7 @@ import { cmsGetProjects } from "@/lib/cms";
 import JsonLd from "@/components/seo/JsonLd";
 import AnswerBox from "@/components/seo/AnswerBox";
 import CardCover, { coverForWork } from "@/components/cards/CardCover";
-import { canonical } from "@/lib/seo";
+import { canonical, keywordsByPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params;
@@ -19,6 +19,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   return {
     title,
     description,
+    keywords: keywordsByPage.work[lang as "es" | "en"],
     alternates: { canonical: canonical(`/${lang}/work`) },
     openGraph: { title, description, url: canonical(`/${lang}/work`), type: "website" },
   };

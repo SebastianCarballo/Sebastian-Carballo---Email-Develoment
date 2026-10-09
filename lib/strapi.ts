@@ -61,24 +61,29 @@ export async function strapiGetProject(slug: string, locale: Locale) {
 }
 
 export async function strapiGetPosts(locale: Locale) {
-  const rows = await strapiGet("/posts?pagination[pageSize]=100&sort=date:desc");
-  return rows.map((r) => ({
-    slug: String(r.slug ?? ""),
-    category: String(r.category ?? ""),
-    tags: (r.tags as string[]) ?? [],
-    minutes: Number(r.minutes ?? 5),
-    date: String(r.date ?? ""),
-    tTitle: String(r[`title_${locale}`] ?? r.title_en ?? ""),
-    tExcerpt: String(r[`excerpt_${locale}`] ?? r.excerpt_en ?? ""),
-    title: { es: String(r.title_es ?? ""), en: String(r.title_en ?? "") },
-    excerpt: { es: String(r.excerpt_es ?? ""), en: String(r.excerpt_en ?? "") },
-  }));
+  const rows = await strapiGet("/posts?populate=cover&pagination[pageSize]=100&sort=date:desc");
+  return rows.map((r) => {
+    const cover = r.cover as { url?: string } | undefined;
+    return {
+      slug: String(r.slug ?? ""),
+      category: String(r.category ?? ""),
+      tags: (r.tags as string[]) ?? [],
+      minutes: Number(r.minutes ?? 5),
+      date: String(r.date ?? ""),
+      coverUrl: cover?.url ? `${strapiUrl}${cover.url}` : undefined,
+      tTitle: String(r[`title_${locale}`] ?? r.title_en ?? ""),
+      tExcerpt: String(r[`excerpt_${locale}`] ?? r.excerpt_en ?? ""),
+      title: { es: String(r.title_es ?? ""), en: String(r.title_en ?? "") },
+      excerpt: { es: String(r.excerpt_es ?? ""), en: String(r.excerpt_en ?? "") },
+    };
+  });
 }
 
 export async function strapiGetPost(slug: string) {
-  const rows = await strapiGet(`/posts?filters[slug][$eq]=${encodeURIComponent(slug)}`);
+  const rows = await strapiGet(`/posts?populate=cover&filters[slug][$eq]=${encodeURIComponent(slug)}`);
   const r = rows[0];
   if (!r) return undefined;
+  const cover = r.cover as { url?: string } | undefined;
   const body = {
     es: mdToParagraphs(r.body_es),
     en: mdToParagraphs(r.body_en),
@@ -89,6 +94,7 @@ export async function strapiGetPost(slug: string) {
     tags: (r.tags as string[]) ?? [],
     minutes: Number(r.minutes ?? 5),
     date: String(r.date ?? ""),
+    coverUrl: cover?.url ? `${strapiUrl}${cover.url}` : undefined,
     title: { es: String(r.title_es ?? ""), en: String(r.title_en ?? "") },
     excerpt: { es: String(r.excerpt_es ?? ""), en: String(r.excerpt_en ?? "") },
     body,

@@ -24,12 +24,16 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
   const project = (await cmsGetProject(slug, lang as "es" | "en")) as {
     title: Record<string, string>;
     excerpt: Record<string, string>;
+    tags?: string[];
+    client?: string;
   } | undefined;
   const title = project ? `${project.title[lang]} — Caso email` : "Caso email";
   const description = project?.excerpt[lang] ?? "Caso real de email development.";
+  const keywords = [...(project?.tags ?? []), project?.client ?? "", "email developer", "caso real email"].filter(Boolean);
   return {
     title,
     description,
+    keywords,
     alternates: { canonical: canonical(`/${lang}/work/${slug}`) },
     openGraph: { title, description, url: canonical(`/${lang}/work/${slug}`), type: "article" },
   };

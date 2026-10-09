@@ -3,12 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { hasLocale } from "@/lib/i18n";
 import { getDictionary } from "../../dictionaries";
-import { cmsGetPost } from "@/lib/cms";
+import { cmsGetPost, cmsGetProject } from "@/lib/cms";
 import { posts } from "@/lib/data";
 import JsonLd from "@/components/seo/JsonLd";
 import AnswerBox from "@/components/seo/AnswerBox";
 import Faq, { faqJsonLd } from "@/components/seo/Faq";
 import ShareButtons from "@/components/seo/ShareButtons";
+import StrapiCover, { postCoverUrl } from "@/components/cards/StrapiCover";
 import { canonical, siteUrl } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -26,12 +27,17 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
     title_en?: string;
     excerpt_es?: string;
     excerpt_en?: string;
+    tags?: string[];
+    category?: string;
   } | undefined;
   const title = (lang === "es" ? post?.title_es : post?.title_en) ?? slug;
   const description = (lang === "es" ? post?.excerpt_es : post?.excerpt_en) ?? "";
+  const postTags = (post?.tags as string[] | undefined) ?? [];
+  const postCategory = (post?.category as string | undefined) ?? "";
   return {
     title: `${title} — Blog email`,
     description,
+    keywords: [postCategory, ...postTags, "email development", "guía email HTML"].filter(Boolean),
     alternates: { canonical: canonical(`/${lang}/blog/${slug}`) },
     openGraph: { title, description, url: canonical(`/${lang}/blog/${slug}`), type: "article" },
   };
@@ -109,6 +115,7 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
   const minutes = Number(post.minutes ?? 5);
   const tags = (post.tags as string[]) ?? [];
   const faqs = POST_FAQS[String(post.slug)]?.[lang] ?? [];
+  const strapiSrc = postCoverUrl(post);
   // Enlazado interno: relacionados por categoría o tags; si no hay
   // coincidencias, se muestran otros artículos para no dejar cabos sueltos.
   const others = posts.filter((p) => p.slug !== String(post.slug));
@@ -120,6 +127,16 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
     }))
     .sort((a, b) => b.score - a.score);
   const related = (scored.some((p) => p.score > 0) ? scored.filter((p) => p.score > 0) : scored).slice(0, 2);
+  // Puente blog → portfolio: cada guía enlaza a su caso práctico.
+  const CASE_FOR_POST: Record<string, string> = {
+    "dark-mode-email": "newsletter-fintech",
+    "outlook-vml": "promo-retail",
+    "accesibilidad-email": "transaccional-saas",
+  };
+  const caseSlug = CASE_FOR_POST[String(post.slug)];
+  const caseProject = caseSlug
+    ? (await cmsGetProject(caseSlug, lang as "es" | "en")) as { title?: Record<string, string>; excerpt?: Record<string, string> } | undefined
+    : undefined;
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -132,6 +149,7 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
     dateModified: "2026-10-09",
     author: { "@type": "Person", name: "Email Developer", url: canonical(`/${lang}/about`) },
     publisher: { "@type": "Organization", name: "inbox.dev", url: siteUrl },
+    ...(strapiSrc ? { image: strapiSrc } : {}),
   };
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -153,6 +171,11 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
         <time dateTime={date}>{category} · {date} · {minutes} {dict.blog.min}</time>
       </p>
       <h1 className="mt-1 text-4xl font-extrabold leading-tight">{title}</h1>
+      {strapiSrc && (
+        <div className="mt-6 overflow-hidden rounded-2xl border">
+          <StrapiCover src={strapiSrc} alt={title} caption={`${category} · ${minutes} ${dict.blog.min}`} />
+        </div>
+      )}
       <div className="mt-4">
         <AnswerBox title={lang === "es" ? "Respuesta directa" : "Direct answer"}>
           <p>{excerpt} {lede}</p>
@@ -192,6 +215,20 @@ export default async function PostPage(props: PageProps<"/[lang]/blog/[slug]">) 
         </section>
       )}
       <ShareButtons title={title} path={`/${lang}/blog/${slug}`} />
+      {caseProject && (
+        <Link
+          href={`/${lang}/work/${caseSlug}`}
+          className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-ink p-5 text-white transition hover:bg-ink-soft"
+        >
+          <span>
+            <span className="font-mono text-xs text-inbox">
+              {lang === "es" ? "Caso práctico" : "Real-world case"}
+            </span>
+            <span className="mt-1 block font-bold">{caseProject.title?.[lang]}</span>
+          </span>
+          <span aria-hidden className="shrink-0 rounded-full bg-cta px-4 py-2 text-sm font-bold">→</span>
+        </Link>
+      )}
       <p className="mt-6 border-t pt-4 font-mono text-xs text-slate-400">
         {lang === "es" ? "Fuente primaria" : "Primary source"}: <a className="underline" href={canonical(`/${lang}/blog/${slug}`)}>{lang === "es" ? "URL canónica" : "Canonical URL"}</a> · {lang === "es" ? "Cita permitida ≤300 palabras con enlace" : "Quotes ≤300 words allowed with link"}
       </p>

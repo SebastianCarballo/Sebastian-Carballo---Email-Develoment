@@ -5,7 +5,7 @@ import { getDictionary } from "../dictionaries";
 import JsonLd from "@/components/seo/JsonLd";
 import Faq, { faqJsonLd } from "@/components/seo/Faq";
 import AnswerBox from "@/components/seo/AnswerBox";
-import { canonical, siteUrl, socials } from "@/lib/seo";
+import { canonical, siteUrl, socials, keywordsByPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params;
@@ -17,6 +17,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   return {
     title,
     description,
+    keywords: keywordsByPage.about[lang as "es" | "en"],
     alternates: { canonical: canonical(`/${lang}/about`) },
     openGraph: { title, description, url: canonical(`/${lang}/about`), type: "profile" },
   };

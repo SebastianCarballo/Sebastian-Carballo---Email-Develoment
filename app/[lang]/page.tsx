@@ -10,7 +10,8 @@ import Marquee from "@/components/motion/Marquee";
 import Typewriter from "@/components/motion/Typewriter";
 import Tilt from "@/components/motion/Tilt";
 import HeroBackground from "@/components/motion/HeroBackground";
-import CardCover, { coverForPost, coverForWork } from "@/components/cards/CardCover";
+import CardCover, { coverAlt, coverForPost, coverForWork } from "@/components/cards/CardCover";
+import StrapiCover, { postCoverUrl } from "@/components/cards/StrapiCover";
 import Badge from "@/components/ui/Badge";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { buttonVariants } from "@/components/ui/Button";
@@ -231,11 +232,17 @@ export default async function HomePage(props: PageProps<"/[lang]">) {
           <div className="mt-6 grid items-stretch gap-4 md:grid-cols-3">
             {posts.map((p, i) => {
               const cover = coverForPost(p.slug, p.category);
+              const caption = `${p.category} · ${p.minutes} ${dict.blog.min}`;
+              const strapiSrc = postCoverUrl(p);
               return (
                 <Reveal key={p.slug} delay={i * 0.08} className="h-full">
                   <HoverLift className="h-full">
                     <Link href={`/${lang}/blog/${p.slug}`} className="card-sheen group flex h-full flex-col overflow-hidden rounded-2xl bg-ink text-white transition hover:shadow-2xl">
-                      <CardCover variant={cover.variant} caption={`${p.category} · ${p.minutes} ${dict.blog.min}`} lang={lang} />
+                      {strapiSrc ? (
+                        <StrapiCover src={strapiSrc} alt={coverAlt(cover.variant, lang)} caption={caption} />
+                      ) : (
+                        <CardCover variant={cover.variant} caption={caption} lang={lang} />
+                      )}
                       <div className="flex flex-1 flex-col p-5">
                         <p className="font-mono text-xs text-inbox">{p.category} · {p.minutes} {dict.blog.min}</p>
                         <h3 className="mt-1 font-bold leading-snug group-hover:text-inbox">{p.tTitle}</h3>

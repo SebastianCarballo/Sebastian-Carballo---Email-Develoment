@@ -5,10 +5,12 @@ import { hasLocale } from "@/lib/i18n";
 import { getDictionary } from "../dictionaries";
 import { cmsGetPosts } from "@/lib/cms";
 import { hasSanityEnv } from "@/sanity/env";
+import { hasStrapiEnv } from "@/lib/strapi";
 import JsonLd from "@/components/seo/JsonLd";
 import AnswerBox from "@/components/seo/AnswerBox";
-import CardCover, { coverForPost } from "@/components/cards/CardCover";
-import { canonical } from "@/lib/seo";
+import CardCover, { coverAlt, coverForPost } from "@/components/cards/CardCover";
+import StrapiCover, { postCoverUrl } from "@/components/cards/StrapiCover";
+import { canonical, keywordsByPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params;
@@ -20,6 +22,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   return {
     title,
     description,
+    keywords: keywordsByPage.blog[lang as "es" | "en"],
     alternates: { canonical: canonical(`/${lang}/blog`) },
     openGraph: { title, description, url: canonical(`/${lang}/blog`), type: "website" },
   };
@@ -61,9 +64,15 @@ export default async function BlogPage(props: PageProps<"/[lang]/blog">) {
       <div className="mt-8 grid items-stretch gap-4 md:grid-cols-3">
         {posts.map((p) => {
           const cover = coverForPost(p.slug, p.category);
+          const caption = `${p.category} · ${p.date}`;
+          const strapiSrc = postCoverUrl(p);
           return (
             <article key={p.slug} className="flex h-full flex-col overflow-hidden rounded-2xl bg-ink text-white">
-              <CardCover variant={cover.variant} caption={`${p.category} · ${p.date}`} lang={lang} />
+              {strapiSrc ? (
+                <StrapiCover src={strapiSrc} alt={coverAlt(cover.variant, lang)} caption={caption} />
+              ) : (
+                <CardCover variant={cover.variant} caption={caption} lang={lang} />
+              )}
               <div className="flex flex-1 flex-col p-5">
               <p className="font-mono text-xs text-inbox">{p.category} · {p.date} · {p.minutes} {dict.blog.min}</p>
               <h2 className="mt-1 text-xl font-bold">{p.tTitle}</h2>
@@ -77,9 +86,11 @@ export default async function BlogPage(props: PageProps<"/[lang]/blog">) {
         })}
       </div>
       <p className="mt-8 rounded-lg border bg-white p-4 font-mono text-xs text-slate-500">
-        {hasSanityEnv
-          ? "Conectado a Sanity Live: publica en /studio y se refleja sin rebuild."
-          : "Modo mock local. Crea .env.local desde .env.local.example y abre /studio para usar Sanity."}
+        {hasStrapiEnv
+          ? "Conectado a Strapi local: edita en /admin y se refleja en ~60s."
+          : hasSanityEnv
+            ? "Conectado a Sanity Live: publica en /studio y se refleja sin rebuild."
+            : "Modo mock local. Crea .env.local desde .env.local.example y abre /studio para usar Sanity."}
       </p>
     </section>
   );

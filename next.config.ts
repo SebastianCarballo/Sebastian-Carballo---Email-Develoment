@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  images: {
+    // Covers servidos por el Strapi local (Media Library).
+    // dangerouslyAllowLocalIP: solo para desarrollo local, ya que Strapi
+    // vive en 127.0.0.1. En producción apunta a un host público y quítalo.
+    dangerouslyAllowLocalIP: true,
+    remotePatterns: [
+      { protocol: "http", hostname: "127.0.0.1", port: "1337", pathname: "/uploads/**" },
+      { protocol: "http", hostname: "localhost", port: "1337", pathname: "/uploads/**" },
+    ],
+  },
   async headers() {
     return [
       {

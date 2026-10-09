@@ -210,6 +210,11 @@ export default function CardCover({
   );
 }
 
+// Texto alternativo conciso para <img> (el <desc> largo vive en el SVG).
+export function coverAlt(variant: string, lang: Locale): string {
+  return ALT[variant]?.[lang]?.title ?? ALT.fintech[lang].title;
+}
+
 // Mapeo slug/categoría → variante visual
 export function coverForWork(slug: string): { variant: string; caption: string } {
   if (slug.includes("fintech")) return { variant: "fintech", caption: "newsletter · 600px modular" };
